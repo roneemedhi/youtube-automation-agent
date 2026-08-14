@@ -1,0 +1,20 @@
+name: Daily YouTube Automation Post
+on:
+  schedule:
+    - cron: '0 14 * * *' # Automatically runs every single day at 14:00 (2:00 PM) UTC
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Run Auto Script
+        run: npm run scheduler
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_TOKEN_DATA: ${{ secrets.YOUTUBE_TOKEN_DATA }}
