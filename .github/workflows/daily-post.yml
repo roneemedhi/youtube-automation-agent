@@ -2,28 +2,36 @@ name: Daily YouTube Automation Post
 
 on:
   schedule:
-    - cron: '0 14 * * *'
-  workflow_dispatch:
+    - cron: '0 14 * * *' # Automatically runs every single day at 2:00 PM UTC
+  workflow_dispatch:     # Keeps the manual "Run Now" button active for you
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
+          
       - run: npm install
-      
-      - name: Recreate YouTube Login Token File
+
+      - name: Force Recreate Configuration and Token Files
         run: |
           mkdir -p config
-          echo '${{ secrets.YOUTUBE_TOKEN_DATA }}' > config/tokens.json
-          echo '{"web":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]}}' > config/credentials.json
           
+          # Inject your YouTube Login Token
+          echo '${{ secrets.YOUTUBE_TOKEN_DATA }}' > config/tokens.json
+          
+          # Universal credentials layout injecting both desktop and web parameters
+          echo '{"web":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]},"installed":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]}}' > config/credentials.json
+
       - name: Run Auto Script
         run: npm run scheduler
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          CRON_ENABLED: "true"
+          DB_PATH: "/tmp/database.sqlite"
