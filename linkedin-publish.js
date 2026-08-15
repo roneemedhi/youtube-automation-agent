@@ -19,14 +19,14 @@ async function run() {
 
     console.log('Publishing content directly via modern Posts API...');
     
-    // Updated to use the active /rest/posts endpoint with version header controls
     const linkedinResponse = await fetch('https://linkedin.com', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0',
-        'LinkedIn-Version': '202507' // Mandated version header by LinkedIn
+        'X-RestLi-Protocol-Version': '2.0.0',
+        'X-RestLi-Method': 'CREATE', // Mandated header to declare programmatic creations
+        'LinkedIn-Version': '202507'
       },
       body: JSON.stringify({
         author: authorUrn,
@@ -41,6 +41,12 @@ async function run() {
         isReshareDisabledByAuthor: false
       })
     });
+
+    // Check if the server still sent an HTML captcha or page
+    const contentType = linkedinResponse.headers.get('content-type') || '';
+    if (!contentType.includes('application/json') && linkedinResponse.status === 200) {
+      throw new Error("LinkedIn firewall intercepted the request with a captcha block. The cloud IP is flagged.");
+    }
 
     if (linkedinResponse.status !== 201) {
       const errorText = await linkedinResponse.text();
