@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p config
           echo '${{ secrets.YOUTUBE_TOKEN_DATA }}' > config/tokens.json
-          echo '${{ secrets.YOUTUBE_TOKEN_DATA }}' > config/credentials.json
+          echo '{"web":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]}}' > config/credentials.json
           
       - name: Run Direct Production Agent
         run: npm start
