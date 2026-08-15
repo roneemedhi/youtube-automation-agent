@@ -1,5 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
-const fetch = require('node-fetch'); // Resolves the ESLint 'fetch is not defined' error
+const fetch = require('node-fetch');
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -7,8 +7,9 @@ async function run() {
   try {
     console.log('Generating deep strategic insights for LinkedIn...');
     
+    // Updated to use the correct available production endpoint
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', 
+      model: 'gemini-2.5-flash', 
       contents: 'Write a professional, short, high-value LinkedIn thought leadership post about AI product management trends.',
     });
     
