@@ -1,0 +1,21 @@
+name: Manual Video Test Run
+
+on:
+  workflow_dispatch: # This adds the "Run Now" button for testing
+
+jobs:
+  run-test-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Run Direct Production Agent
+        run: npm start # This skips the clock and forces a video build immediately!
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_TOKEN_DATA: ${{ secrets.YOUTUBE_TOKEN_DATA }}
