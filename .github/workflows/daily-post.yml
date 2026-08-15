@@ -14,10 +14,16 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
+      
+      - name: Recreate YouTube Login Token File
+        run: |
+          mkdir -p config
+          echo '${{ secrets.YOUTUBE_TOKEN_DATA }}' > config/tokens.json
+          echo '{"web":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]}}' > config/credentials.json
+          
       - name: Run Auto Script
         run: npm run scheduler
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
-          YOUTUBE_TOKEN_DATA: ${{ secrets.YOUTUBE_TOKEN_DATA }}
