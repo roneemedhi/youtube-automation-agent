@@ -2,28 +2,29 @@ name: Weekly LinkedIn Thought Leadership Post
 
 on:
   schedule:
-    - cron: '0 9 * * 2' # Fires every Tuesday at 9:00 AM UTC (Prime LinkedIn traffic time!)
-  workflow_dispatch:     # Keeps your manual "Run Now" button active
+    - cron: '0 9 * * 2' # Fires every Tuesday at 9:00 AM UTC
+  workflow_dispatch:   # Keeps your manual "Run Now" button active
 
 jobs:
   post-to-linkedin:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - run: npm install
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
 
-      - name: Generate Executive AI Content
-        id: content-gen
-        run: |
-          node -e "console.log('Generating deep strategic insights for AI Product Leader...');"
-          
-      - name: Publish Direct to Personal Profile Feed
-        run: |
-          echo "Publishing high-value thought leadership content directly to Ronee's personal profile..."
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Generation and Posting Script
+        run: node publish.js
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
           LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }} # Required for posting
