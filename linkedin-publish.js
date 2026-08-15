@@ -19,15 +19,14 @@ async function run() {
 
     console.log('Publishing content directly via modern Posts API...');
     
-    const linkedinResponse = await fetch('https://api.linkedin.com/rest/posts', {
+    const linkedinResponse = await fetch('https://linkedin.com', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
         'X-Restli-Protocol-Version': '2.0.0',
         'X-Restli-Method': 'CREATE',
-        'LinkedIn-Version': '202507',
-        // --- THE FIX: Mask the script identity to mimic a real browser ---
+        'LinkedIn-Version': '202603', // Updated to a valid version string matching the API timeline
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
       },
       body: JSON.stringify({
@@ -43,15 +42,6 @@ async function run() {
         isReshareDisabledByAuthor: false
       })
     });
-
-    const contentType = linkedinResponse.headers.get('content-type') || '';
-    
-    // Explicit error logging if an HTML block leaks through
-    if (linkedinResponse.status === 200 && !contentType.includes('application/json')) {
-      const debugHtml = await linkedinResponse.text();
-      console.error('Debug Firewall Output Context:', debugHtml.substring(0, 300));
-      throw new Error("LinkedIn firewall intercepted the request. Double-check your access token validity.");
-    }
 
     if (linkedinResponse.status !== 201) {
       const errorText = await linkedinResponse.text();
