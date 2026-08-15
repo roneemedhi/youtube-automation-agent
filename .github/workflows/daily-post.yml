@@ -27,11 +27,20 @@ jobs:
           # Universal credentials layout injecting both desktop and web parameters
           echo '{"web":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]},"installed":{"client_id":"${{ secrets.YOUTUBE_CLIENT_ID }}","client_secret":"${{ secrets.YOUTUBE_CLIENT_SECRET }}","redirect_uris":["http://localhost:8080/oauth2callback"]}}' > config/credentials.json
 
-      - name: Run Auto Script
-        run: npm run scheduler
+      - name: Run Auto Script (Direct Force Trigger)
+        run: |
+          node -e "
+          const { DailyAutomation } = require('./schedules/daily-automation.js');
+          // Mocking the required agents and database instances to fire the generation directly
+          const runner = new DailyAutomation({}, {}); 
+          runner.runDailyContentGeneration()
+            .then(() => console.log('✅ Direct content execution complete.'))
+            .catch(err => { console.error('❌ Generation crashed:', err); process.exit(1); });
+          "
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           CRON_ENABLED: "true"
           DB_PATH: "/tmp/database.sqlite"
+
