@@ -1,13 +1,12 @@
 const { GoogleGenAI } = require('@google/genai');
+const fetch = require('node-fetch'); // Resolves the ESLint 'fetch is not defined' error
 
-// Uses the correct environment variable
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function run() {
   try {
     console.log('Generating deep strategic insights for LinkedIn...');
     
-    // Updated to use the standard current model name
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash', 
       contents: 'Write a professional, short, high-value LinkedIn thought leadership post about AI product management trends.',
