@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-          npm install @google/genai
+          npm install @google/genai node-fetch@2
 
       - name: Run Generation and Posting Script
         run: node linkedin-publish.js
