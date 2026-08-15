@@ -14,22 +14,27 @@ async function run() {
     const postText = response.text;
     console.log('Content generated successfully.');
 
-    // --- NEW STEP: Dynamically fetch your unique LinkedIn Person URN ---
+    // --- Dynamic Profile Identity Lookup ---
     console.log('Fetching your unique LinkedIn profile details...');
     const profileResponse = await fetch('https://linkedin.com', {
-      headers: { 'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}` }
+      method: 'GET',
+      headers: { 
+        'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
+        'X-Restli-Protocol-Version': '2.0.0'
+      }
     });
 
-    if (!profileResponse.ok) {
+    const profileContentType = profileResponse.headers.get('content-type') || '';
+    if (!profileResponse.ok || !profileContentType.includes('application/json')) {
       const profileError = await profileResponse.text();
-      throw new Error(`Failed to fetch LinkedIn profile: ${profileError}`);
+      throw new Error(`LinkedIn Profile API returned non-JSON/Error data: ${profileError.substring(0, 200)}`);
     }
 
     const profileData = await profileResponse.json();
     const authorUrn = `urn:li:person:${profileData.id}`;
     console.log(`Successfully verified author identity: ${authorUrn}`);
-    // -----------------------------------------------------------------
 
+    // --- Publish Content directly to Feed ---
     console.log('Publishing content directly to LinkedIn profile...');
     const linkedinResponse = await fetch('https://linkedin.com', {
       method: 'POST',
@@ -39,7 +44,7 @@ async function run() {
         'X-Restli-Protocol-Version': '2.0.0'
       },
       body: JSON.stringify({
-        author: authorUrn, // Dynamically uses the correct person URN format
+        author: authorUrn,
         lifecycleState: 'PUBLISHED',
         specificContent: {
           'com.linkedin.ugc.ShareContent': {
