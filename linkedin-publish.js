@@ -7,9 +7,9 @@ async function run() {
   try {
     console.log('Generating deep strategic insights for LinkedIn...');
     
-    // Updated to use the correct available production endpoint
+    // Updated to use the active production model name
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', 
+      model: 'gemini-3.5-flash', 
       contents: 'Write a professional, short, high-value LinkedIn thought leadership post about AI product management trends.',
     });
     
@@ -17,7 +17,7 @@ async function run() {
     console.log('Content generated successfully.');
 
     console.log('Publishing content directly to LinkedIn profile...');
-    const linkedinResponse = await fetch('https://linkedin.com', {
+    const linkedinResponse = await fetch('https://api.linkedin.com/v2/ugcPosts', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
